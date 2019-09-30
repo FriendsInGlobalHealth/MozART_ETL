@@ -8,8 +8,10 @@ SELECT CONCAT(
     '` UNION '
 ) 
 FROM INFORMATION_SCHEMA.TABLES 
-WHERE table_schema = 'ccs_romao_mozartq3';
+WHERE table_schema = 'ccs_romao_mozartq3'; -- REPLACE WITH PARTNER SCHEMA
 
+-- AFTER RUNNING THE ABOVE CODE, YOU WILL GET THE FOLLOWING OUTPUT IN THE RESULT WINDOW
+-- COPY EVERYTHING UNTIL THE LAST UNION INTO THE EDITOR AND RUN TO GET A TABLE OF COUNTS
 
 SELECT "t_aconselhamento" AS table_name, COUNT(*) AS exact_row_count FROM `ccs_romao_mozartq3`.`t_aconselhamento` UNION 
 SELECT "t_actividadeaconselhamento" AS table_name, COUNT(*) AS exact_row_count FROM `ccs_romao_mozartq3`.`t_actividadeaconselhamento` UNION 
