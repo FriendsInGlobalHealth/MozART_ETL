@@ -1,1 +1,3 @@
-This is for the cleaning script during the MozART import process
+# Cleaning Scripts
+
+1) Cleaning scripts should be archived here after each ETL
