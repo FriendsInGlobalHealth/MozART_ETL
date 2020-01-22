@@ -13,4 +13,6 @@ t_seguimento
 t_tratamentoseguimento
 t_tratamentoTB
 
-Click the Unicode box to export corretly, and export as a Flat File (CSV)
+Use this website: https://sqlbak.com/blog/export-sql-table-to-excel
+  Follow directions for 2. Safe and secure
+MODIFICATION: Click the Unicode box to export correctly, and export as a Flat File (CSV)
