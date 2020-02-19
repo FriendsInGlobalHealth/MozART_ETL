@@ -41,3 +41,7 @@ SELECT "t_tarv" AS table_name, COUNT(*) AS exact_row_count FROM `ccs_romao_mozar
 SELECT "t_tratamentoseguimento" AS table_name, COUNT(*) AS exact_row_count FROM `ccs_romao_mozartq3`.`t_tratamentoseguimento` UNION 
 SELECT "t_tratamentotb" AS table_name, COUNT(*) AS exact_row_count FROM `ccs_romao_mozartq3`.`t_tratamentotb` UNION 
 SELECT "t_void_duplo" AS table_name, COUNT(*) AS exact_row_count FROM `ccs_romao_mozartq3`.`t_void_duplo` UNION 
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+SELECT hdd FROM t_hdd
