@@ -1,0 +1,104 @@
+setwd("M:/PARTNER DATA TRANSFERS/2020_Q4")
+#clear R
+rm(list = ls())
+#Load ODBC package for MS Access Files
+#make sure Rstudio is in 32-bit by going to tools->global options
+library(RODBC)
+library(dplyr)
+
+#\\172.24.60.71\Mozart_Database\PARTNER DATA TRANSFERS\2020_Q1\ARIEL_Q1
+
+#parent folder should be where every database needed is stored
+Parent.Folder <- "M:\\PARTNER DATA TRANSFERS\\2020_Q4\\ICAP_Q4\\ICAP_MozART_Q4_FY20_ACCESS\\ICAP_MozART_Q4_FY20_ACCESS\\teste"
+
+
+#M:\PARTNER DATA TRANSFERS\2020_Q4\ICAP_Q4\ICAP_MozART_Q4_FY20_ACCESS\ICAP_MozART_Q4_FY20_ACCESS
+
+
+#Parent.Folder <- "//172.24.60.71/Mozart_Database/PARTNER DATA TRANSFERS/ICAP_Q4/ICAP_MozART_Q4_FY20_ACCESS/ICAP_MozART_Q4_FY20_ACCESS"
+
+
+
+#creation of list of databases/inputs
+list_filenames <- list.files(Parent.Folder, full.names = TRUE, recursive = FALSE)
+acc_files <- list_filenames[grep(".mdb", list_filenames)]
+
+
+#run loop of selecting hdd table from each DB, converting the columns to factors
+output <- lapply(acc_files, 
+                 function(file) {
+                   channel <- odbcConnectAccess(file)                       
+                   data <- sqlQuery(channel, "select * from t_hdd")
+                   close(channel)
+                   return(data) 
+                 })
+output <- lapply(output, function(x) {
+  x[] <- lapply(x, as.factor)
+  x
+})
+#combine using rbind to append parts of output
+healthfacility <- rbind(output)
+
+#write.csv(healthfacilities1, file = "health_facilitiesTOTAL.csv")
+#write.csv(healthfacility.counts, file = "health_facilityReduc.csv")
+
+
+
+#run loop of selecting patient table from each DB, converting the columns to factors
+list_filenames1 <- list.files(Parent.Folder, full.names = TRUE, recursive = FALSE)
+acc_files1 <- list_filenames1[grep(".mdb", list_filenames1)]
+
+output1 <- lapply(acc_files1, 
+                  function(file) {
+                    channel <- odbcConnectAccess(file)
+                    data <- sqlQuery(channel, "select * from t_paciente")
+                    close(channel)
+                    return(data) 
+                  })
+output1 <- lapply(output1, function(x) {
+  x[] <- lapply(x, as.factor)
+  x
+})
+
+#channel <- odbcConnectDbase(acc_files1[1])
+#data <-sqlQuery(channel, "select * from t_paciente")
+#data <-sqlQuery(channel, "select * from t_hdd")
+
+#combine using rbind to append parts of output
+patient <- rbind(output1)
+
+#rANDY cODE
+#typeof(patient)
+#typeof(healthfacility)
+
+
+#rename column to common name of lowercase hdd
+colnames(healthfacility)[colnames(healthfacility)=="HdD"] <- "hdd"
+as.data.frame(patient)
+as.data.frame(healthfacility)
+#join dataframes on common hdd column (basically patient rows will all get populated with facility data from hdd table)
+test1<-left_join(patient,healthfacility, by="hdd")
+
+
+#need to find UNIQUE nid, hdd. designacao in order to find accurate counts
+####During this step, check New ID column for NA values - this indicates NIDs without NewID, which needs to be flagged; report which facility 
+##also check previous step to see if column is named with different case and update
+unique.patient.counts <- distinct(test1, nid, hdd, designacao, NewID)
+
+#list of each designacao and the newIds (# NewIDs per designacao) - eyeball to make sure each HF has >0 New IDS created
+final.NewIDcounts.bydesignacao <- count(unique.patient.counts, NewID)
+
+#list of each facility (hdd) and the number of current patients in each (# NIDs per hdd) - use to update EPTS Excel file
+final.counts.byhdd <- count(unique.patient.counts, hdd, designacao)
+#to export 
+write.csv(final.counts.byhdd, file="EGPAF.patientcounts.csv")
+
+
+
+
+#write.csv(final.counts.bydesignacao, file="CCScounts.csv")
+
+##populate counts, presence of data and NewID in excel document for partner data submission tracking & feedback
+############REMEMBER TO RUN SCRIPT SEPARATELY BY PARTNER, POPULATE COUNTS, THEN RUN FOR NEXT PARTNER & REPEAT####
+
+
